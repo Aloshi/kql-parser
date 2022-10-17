@@ -19,7 +19,7 @@ def escaped_unicode_sequence():
 def keyword():
     # make sure this ends on a word boundary so stuff like "ora" or "andy" doesn't match
     # (And does not consume input)
-    return ['or', 'and', 'not'], And([' ', special_character, EOF])
+    return ['or ', 'and ', 'not '] #, And([' ', special_character, EOF])
 
 def escaped_keyword():
     return '\\', keyword
@@ -27,6 +27,8 @@ def escaped_keyword():
 def wildcard():
     return '*'
 
+def _not():
+    return 'not '
 
 def unquoted_character():
     return [escaped_whitespace, escaped_special_character, escaped_unicode_sequence, escaped_keyword, wildcard,
@@ -41,20 +43,17 @@ def quoted_character():
     return [escaped_whitespace, escaped_unicode_sequence, '\\"', RegExMatch(r'[^"\\]+')]
 
 def quoted_string():
-    return Sequence('"', ZeroOrMore(quoted_character), '"', skipws=False)
+    return Sequence(ZeroOrMore(' ', suppress=True), '"', ZeroOrMore(quoted_character), '"', skipws=False)
 
 def literal():
     return [quoted_string, unquoted_literal]
 
-def value_expression():
-    return literal
-
 
 def field():
-    return unquoted_literal
+    return [quoted_string, unquoted_literal]
 
 def not_list_of_values():
-    return [('not ', list_of_values), list_of_values]
+    return [(_not, list_of_values), list_of_values]
 
 def and_list_of_values():
     return [(not_list_of_values, OneOrMore(('and ', not_list_of_values))), not_list_of_values]
@@ -66,12 +65,14 @@ def list_of_values():
     return [('(', or_list_of_values, ')'), literal]
 
 
+def value_expression():
+    return literal
+
 def field_value_expression():
     return field, ':', list_of_values
 
-
 def field_range_expression():
-    return 'idklol1'
+    return 'TODO'
 
 
 def expression():

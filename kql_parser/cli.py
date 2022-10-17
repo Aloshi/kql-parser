@@ -1,8 +1,9 @@
 import click
 import sys
 from arpeggio import visit_parse_tree
+from pprint import pprint
 from .parser import KQLParseError, Parser
-from .visitor import KQLVisitor
+from .visitor import ExpressionNode
 
 
 @click.group()
@@ -15,18 +16,15 @@ def cli():
 @click.option('--tree/--no-tree', 'print_tree', type=bool, default=False)
 @click.option('--debug/--no-debug', 'debug', type=bool, default=False)
 def parse(expr: str, print_tree: bool, debug: bool):
-    print(expr)
+    click.echo(expr)
     parser = Parser(debug=debug)
 
     try:
-        parse_tree = parser.parse(expr)
-        print('---visitor ---')
-        visit_parse_tree(parse_tree, KQLVisitor(debug=debug))
-
+        tree = parser.parse(expr)
         if print_tree:
-            print(parse_tree.tree_str())
-        else:
-            print(parse_tree)
+            pprint(tree)
+        
+        click.echo(str(tree))
     except KQLParseError as e:
         click.echo(str(e))
         sys.exit(1)
