@@ -1,0 +1,2 @@
+arpeggio
+click>=8.1.0
