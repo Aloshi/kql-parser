@@ -38,7 +38,7 @@ print(tree)
 Also included is a little CLI tool, useful for testing:
 
 ```bash
-kql-parser parse 'some:   expression' --print-input --tree
+$ kql-parser parse 'some:   expression' --print-input --tree
 
 some:   expression  # input
 ExpressionQueryNode(expression=FieldValueExpressionNode(field=UnquotedLiteralNode(value='some'), value=UnquotedLiteralNode(value='expression')))  # parse tree
@@ -46,6 +46,7 @@ some: expression  # stringified parse tree
 ```
 
 # TODO
+* Needs to support case insensitivity in keywords (this is a big one!)
 * Needs tests (!!!)
-* Needs to support case insensitivity in keywords!
+* Add a nicer way to print the parse tree
 * Move the CLI bit into something configurable so you can pull this project without installing click
