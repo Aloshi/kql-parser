@@ -11,12 +11,24 @@ def cli():
     pass
 
 
-@cli.command('parse')
+@cli.command('parse',
+             help='Parse a KQL query and print it back out in a normalized form.\n\n'
+                  "$ kql-parser parse 'test:   ((a   or  b) and c) or \"quoted   value\"'\n\n"
+                  "test: ((a or b) and c) or \"quoted   value\"")
 @click.argument('expr', type=str)
-@click.option('--tree/--no-tree', 'print_tree', type=bool, default=False)
-@click.option('--debug/--no-debug', 'debug', type=bool, default=False)
-def parse(expr: str, print_tree: bool, debug: bool):
-    click.echo(expr)
+@click.option('--print-input/--no-print-input', 'print_input',
+              help='Print the input argument (useful for debugging shell escape-related issues).',
+              type=bool, default=False)
+@click.option('--tree/--no-tree', 'print_tree',
+              help='Print the repr of the tree of parsed nodes.',
+              type=bool, default=False)
+@click.option('--debug/--no-debug', 'debug',
+              help='Enable arpeggio\'s debug output (prints parse rule logs, the final arpeggio parse tree, generates graphviz .dot files of the parse tree, and prints parse tree visitor logs).',
+              type=bool, default=False)
+def parse(expr: str, print_input: bool, print_tree: bool, debug: bool):
+    if print_input:
+        click.echo(expr)
+
     parser = Parser(debug=debug)
 
     try:

@@ -1,6 +1,7 @@
 from arpeggio import ZeroOrMore, OneOrMore, EOF, RegExMatch, Not, And, Sequence
 
-# Porting the grammar from
+# Port of the Peggy grammar in Kibana 8.4, with a few changes
+# (mostly around unquoted_literal / unquoted_character to work with arpeggio's "eat whitespace by defaukt" behavior)
 # https://github.com/elastic/kibana/blob/153f65990ee614677a9c3b2beda634219b6eeee8/packages/kbn-es-query/grammar/grammar.peggy
 
 

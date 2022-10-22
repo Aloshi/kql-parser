@@ -7,6 +7,12 @@ _Not = object()
 
 
 class KQLVisitor(PTNodeVisitor):
+    """
+    Cleans up the arpeggio parse tree into a cleaner tree defined with kql_parser.nodes.
+
+    This gets rid of the "empty" intermediate nodes necessitated by the lack of left-recursive rules
+    and is generally nicer to work with.
+    """
     def visit_unquoted_literal(self, node, children):
         return UnquotedLiteralNode(''.join(children).strip())
     
@@ -50,6 +56,10 @@ class KQLVisitor(PTNodeVisitor):
     def visit_value_expression(self, node, children):
         assert len(children) == 1
         return ValueExpressionNode(children[0])
+    
+    def visit_expression(self, node, children):
+        assert len(children) == 1
+        return ExpressionQueryNode(children[0])
 
     def visit_nested_query(self, node, children):
         if children.field:
