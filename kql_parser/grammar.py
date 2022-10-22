@@ -30,6 +30,12 @@ def wildcard():
 def _not():
     return 'not '
 
+def _or():
+    return 'or '
+
+def _and():
+    return 'and '
+
 def unquoted_character():
     return [escaped_whitespace, escaped_special_character, escaped_unicode_sequence, escaped_keyword, wildcard,
         (Not(keyword), RegExMatch(r'[^\\():<>"*{} ]+| +'))]  # ensure it's not a keyword, then consume input until the next boundary
@@ -65,6 +71,22 @@ def list_of_values():
     return [('(', or_list_of_values, ')'), literal]
 
 
+def nested_query():
+    return [(field, ':', '{', or_query, '}'), expression]
+
+def sub_query():
+    return [('(', or_query, ')'), nested_query]
+
+def not_query():
+    return [(_not, sub_query), sub_query]
+
+def and_query():
+    return [(not_query, OneOrMore(_and, not_query)), not_query]
+
+def or_query():
+    return [(and_query, OneOrMore(_or, and_query)), and_query]
+
+
 def value_expression():
     return literal
 
@@ -79,5 +101,5 @@ def expression():
     #return [field_range_expression, field_value_expression, value_expression]
     return [field_value_expression, value_expression]
 
-def root():
-    return expression, EOF
+def start():
+    return or_query, EOF

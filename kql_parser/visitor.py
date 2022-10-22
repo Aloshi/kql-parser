@@ -1,61 +1,14 @@
-from dataclasses import dataclass
-from typing import Union, List, Literal
 from arpeggio import PTNodeVisitor
 
-from .grammar import *
+from .nodes import *
 
+# internal constant used to keep the "not" token around (since arpeggio stringifies by default)
 _Not = object()
-
-@dataclass
-class LiteralNode:
-    value: str
-
-@dataclass
-class UnquotedLiteralNode(LiteralNode):
-    def __str__(self) -> str:
-        return self.value
-
-@dataclass
-class QuotedLiteralNode(LiteralNode):
-    def __str__(self) -> str:
-        return f'"{self.value}"'
-
-
-@dataclass
-class ListOfValuesNode:
-    operator: Union[Literal['or'], Literal['and'], Literal['not']]
-    children: List[Union[LiteralNode, 'ListOfValuesNode']]
-
-    def __str__(self) -> str:
-        if len(self.children) == 1:
-            if self.operator == 'not':
-                return f'not {self.children[0]}'
-            else:
-                return str(self.children[0])
-
-        return '(' + f' {self.operator} '.join(str(c) for c in self.children) + ')'
-
-
-@dataclass
-class ExpressionNode:
-    pass
-
-@dataclass
-class ValueExpressionNode(ExpressionNode):
-    value: LiteralNode
-
-@dataclass
-class FieldValueExpressionNode(ExpressionNode):
-    field: LiteralNode
-    value: ListOfValuesNode
-
-    def __str__(self) -> str:
-        return f'{self.field}: {self.value}'
 
 
 class KQLVisitor(PTNodeVisitor):
     def visit_unquoted_literal(self, node, children):
-        return UnquotedLiteralNode(''.join(children))
+        return UnquotedLiteralNode(''.join(children).strip())
     
     def visit_quoted_string(self, node, children):
         return QuotedLiteralNode(''.join(children))
@@ -97,3 +50,36 @@ class KQLVisitor(PTNodeVisitor):
     def visit_value_expression(self, node, children):
         assert len(children) == 1
         return ValueExpressionNode(children[0])
+
+    def visit_nested_query(self, node, children):
+        if children.field:
+            assert len(children.field) == 1
+            assert len(children.expression) == 1
+            return NestedQueryNode(field=children.field[0], query=children.expression[0])
+        else:
+            assert len(children) == 1
+            return children[0]  # expression
+
+    def visit_sub_query(self, node, children):
+        assert len(children) == 1
+        if children.or_query:
+            return SubQueryNode(children[0])
+        return children[0]
+
+    def visit_not_query(self, node, children):
+        if len(children) == 1:
+            return children[0]  # sub_query
+        
+        assert children[0] == _Not
+        assert len(children) == 2
+        return NotQueryNode(query=children[1])
+
+    def visit_and_query(self, node, children):
+        if len(children) == 1:
+            return children[0]  # not_query
+        return AndQueryNode(children=children)
+
+    def visit_or_query(self, node, children):
+        if len(children) == 1:
+            return children[0]  # and_query
+        return OrQueryNode(children=children)
