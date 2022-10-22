@@ -8,13 +8,23 @@ This should pretty faithfully re-implement
 
 You can parse KQL expressions into a tree which makes analysis and re-writing easier. It's kind of like the parse tree parts of [Luqum](https://github.com/jurismarches/luqum), but for KQL.
 
+For example, when paired with the appropriate Kibana saved object data, you could use this to see what documents dashboards/visualizations/alerts are actually looking at.
+(Particularly useful if you can't use the [field usage stats API](https://www.elastic.co/guide/en/elasticsearch/reference/current/field-usage-stats.html)
+because you have a common set of fields across most documents, but documents are filtered by some `type: blah`-esque query.)
+
 ## How do I use it?
+
+First, install the library (add to `requirements.txt` and/or `pip install kql-parser`).
 
 ```python
 from kql_parser.parser import KQLParseError, Parser
 
 parser = Parser()
-tree = parser.parse('a: b or c: (list or of or values) or "bare string"')
+
+try:
+    tree = parser.parse('a: b or c: (list or of or values) or "bare string"')
+except KQLParseError as e:
+    print(e)
 
 # print the parse tree (kind of ugly, sorry)
 print(repr(tree))
@@ -38,3 +48,4 @@ some: expression
 # TODO
 * Needs tests (!!!)
 * Needs to support case insensitivity in keywords!
+* Move the CLI bit into something configurable so you can pull this project without installing click
