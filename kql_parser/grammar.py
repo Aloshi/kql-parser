@@ -32,7 +32,7 @@ def _not():
 
 def unquoted_character():
     return [escaped_whitespace, escaped_special_character, escaped_unicode_sequence, escaped_keyword, wildcard,
-        (Not(keyword), RegExMatch(r'[^\\():<>"*{} ]+'))]  # ensure it's not a keyword, then consume input until the next boundary
+        (Not(keyword), RegExMatch(r'[^\\():<>"*{} ]+| +'))]  # ensure it's not a keyword, then consume input until the next boundary
 
 def unquoted_literal():
     # some tricky stuff with 'skipws' here. arpeggio skips whitespace, but unquoted literals are whitespace-sensitive
