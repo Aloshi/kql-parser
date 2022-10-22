@@ -38,11 +38,11 @@ print(tree)
 Also included is a little CLI tool, useful for testing:
 
 ```bash
-kql-parser parse 'some: expression' --print-input --tree
+kql-parser parse 'some:   expression' --print-input --tree
 
-some: expression
-ExpressionQueryNode(expression=FieldValueExpressionNode(field=UnquotedLiteralNode(value='some'), value=UnquotedLiteralNode(value='expression')))
-some: expression
+some:   expression  # input
+ExpressionQueryNode(expression=FieldValueExpressionNode(field=UnquotedLiteralNode(value='some'), value=UnquotedLiteralNode(value='expression')))  # parse tree
+some: expression  # stringified parse tree
 ```
 
 # TODO
