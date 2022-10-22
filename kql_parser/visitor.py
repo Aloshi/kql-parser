@@ -53,6 +53,12 @@ class KQLVisitor(PTNodeVisitor):
         assert len(children.list_of_values) == 1
         return FieldValueExpressionNode(children.field[0], children.list_of_values[0])
 
+    def visit_field_range_expression(self, node, children):
+        assert len(children.field) == 1
+        assert len(children.range_operator) == 1
+        assert len(children.literal) == 1
+        return FieldRangeExpressionNode(children.field[0], children.range_operator[0], children.literal[0])
+
     def visit_value_expression(self, node, children):
         assert len(children) == 1
         return ValueExpressionNode(children[0])

@@ -92,6 +92,22 @@ class FieldValueExpressionNode(ExpressionNode):
     def __str__(self) -> str:
         return f'{self.field}: {self.value}'
 
+@dataclass
+class FieldRangeExpressionNode(ExpressionNode):
+    """
+    Expression for filtering a field by some range.
+
+    KQL examples:
+    * `field > 500`
+    * `field <= 100`
+    """
+    field: LiteralNode
+    operator: Union[Literal['<='], Literal['>='], Literal['<'], Literal['>']]
+    value: LiteralNode
+
+    def __str__(self) -> str:
+        return f'{self.field} {self.operator} {self.value}'
+
 
 @dataclass
 class QueryNode:

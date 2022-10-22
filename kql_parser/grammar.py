@@ -37,6 +37,9 @@ def _or():
 def _and():
     return 'and '
 
+def range_operator():
+    return ['<=', '>=', '<', '>']
+
 def unquoted_character():
     return [escaped_whitespace, escaped_special_character, escaped_unicode_sequence, escaped_keyword, wildcard,
         (Not(keyword), RegExMatch(r'[^\\():<>"*{} ]+| +'))]  # ensure it's not a keyword, then consume input until the next boundary
@@ -95,12 +98,11 @@ def field_value_expression():
     return field, ':', list_of_values
 
 def field_range_expression():
-    return 'TODO'
+    return field, range_operator, literal
 
 
 def expression():
-    #return [field_range_expression, field_value_expression, value_expression]
-    return [field_value_expression, value_expression]
+    return [field_range_expression, field_value_expression, value_expression]
 
 def start():
     return or_query, EOF
