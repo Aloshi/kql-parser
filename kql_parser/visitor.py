@@ -70,8 +70,9 @@ class KQLVisitor(PTNodeVisitor):
     def visit_nested_query(self, node, children):
         if children.field:
             assert len(children.field) == 1
-            assert len(children.expression) == 1
-            return NestedQueryNode(field=children.field[0], query=children.expression[0])
+            assert len(children.or_query) == 1
+            assert len(children.expression) == 0
+            return NestedQueryNode(field=children.field[0], query=children.or_query[0])
         else:
             assert len(children) == 1
             return children[0]  # expression
